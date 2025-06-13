@@ -19,7 +19,7 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_KEY }}
         source: "."
-        target: "/llulluna_fernando/cancha_backend"
+        target: "/root/llulluna_fernando/cancha_backend"
 
     - name: Run deploy commands on VPS
       uses: appleboy/ssh-action@v1.0.3
@@ -28,7 +28,7 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_KEY }}
         script: |
-          cd /llulluna_fernando/cancha_backend
+          cd /root/llulluna_fernando/cancha_backend
           echo "$${{ secrets.ENV_FILE }}" > .env
           npm install
           npm run build
