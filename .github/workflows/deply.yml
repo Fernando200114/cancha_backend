@@ -15,7 +15,7 @@ jobs:
     - name: Copy project to VPS
       uses: appleboy/scp-action@v0.1.3
       with:
-        host: ${{ secrets.VPS_HOST }}
+        host: ${{ secrets.VPS_HOST }
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_KEY }}
         source: "."
@@ -28,8 +28,15 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_KEY }}
         script: |
-          cd /root/llulluna_fernando/cancha_backend
-          echo "$${{ secrets.ENV_FILE }}" > .env
+          cd /root/paredes_erick/pagina_backend
+           # Matar el proceso que está usando el puerto 3013
+          echo "Matar proceso en el puerto 3013..."
+          sudo lsof -t -i:3013 | xargs sudo kill -9
+          
+          echo -e "${{ secrets.ENV_FILE }}" > .env
           npm install
           npm run build
-          pm2 restart cancha_proyecto-app-api || pm2 start dist/main.js --name cancha_proyecto-app-api
+          # Reiniciar PM2 con el nuevo código
+          pm2 stop cancha-proyecto-api || true
+          pm2 delete cancha-proyecto-api || true
+          pm2 start dist/main.js --name cancha-proyecto-api
