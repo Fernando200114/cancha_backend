@@ -1,41 +1,44 @@
+// src/auth/auth.service.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
-import { LoginDto } from './dto/login.dto';
-import { CreateUserDto } from '../users/dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import { UsuariosService } from '../usuarios/usuarios.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
-    private readonly jwtService: JwtService,
+    private usuariosService: UsuariosService,
+    private jwtService: JwtService,
   ) {}
 
-  async login(loginDto: LoginDto) {
-    // Busca por el nombre del equipo
-    const user = await this.usersService.findByTeamName(loginDto.username);
-    if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
-      throw new UnauthorizedException('Credenciales inválidas');
-    }
+  async register(data: any) {
+    const { nombre, correo, password } = data;
 
-    // Crea el token JWT con id y teamName
-    const payload = { id: user.id, teamName: user.teamName };
-    return { access_token: this.jwtService.sign(payload) };
-  }
+    const existe = await this.usuariosService.buscarPorCorreo(correo);
+    if (existe) throw new UnauthorizedException('Correo ya registrado');
 
-  async register(createUserDto: CreateUserDto) {
-    // Hashea la contraseña antes de guardar (buena práctica)
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
-
-    // Crea el usuario con la contraseña hasheada
-    const user = await this.usersService.create({
-      ...createUserDto,
-      password: hashedPassword,
+    const passwordHash = await bcrypt.hash(password, 10);
+    const nuevo = await this.usuariosService.crear({
+      nombre,
+      correo,
+      password: passwordHash,
     });
 
-    const payload = { id: user.id, teamName: user.teamName };
-    return { access_token: this.jwtService.sign(payload) };
+    return { mensaje: 'Usuario creado', usuario: nuevo };
+  }
+
+  async login(data: any) {
+    const { correo, password } = data;
+
+    const usuario = await this.usuariosService.buscarPorCorreo(correo);
+    if (!usuario) throw new UnauthorizedException('Correo incorrecto');
+
+    const match = await bcrypt.compare(password, usuario.password);
+    if (!match) throw new UnauthorizedException('Contraseña incorrecta');
+
+    const payload = { sub: usuario.id, rol: usuario.rol };
+    const token = await this.jwtService.signAsync(payload);
+
+    return { token };
   }
 }

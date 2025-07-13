@@ -1,11 +1,15 @@
+// src/jugadores/jugadores.module.ts
+
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose'; // Importa el módulo de Mongoose
 import { JugadoresService } from './jugadores.service';
 import { JugadoresController } from './jugadores.controller';
-import { Jugador } from './jugador.entity';
+import { JugadorSchema } from './jugadores.schema'; // Importa el esquema de Jugador
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Jugador])],
+  imports: [
+    MongooseModule.forFeature([{ name: 'Jugador', schema: JugadorSchema }]) // Registra el modelo
+  ],
   controllers: [JugadoresController],
   providers: [JugadoresService],
 })
