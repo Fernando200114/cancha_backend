@@ -1,17 +1,15 @@
 // src/equipos/equipos.service.ts
-
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose'; // Permite usar modelo con Mongo
+import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateEquipoDto } from './dto/create-equipo.dto';
 
 @Injectable()
 export class EquiposService {
   constructor(
-    @InjectModel('Equipo') private readonly equipoModel: Model<any> // Inyecta el modelo de equipo
+    @InjectModel('Equipo') private readonly equipoModel: Model<any>,
   ) {}
 
-  // Método corregido para mapear _id a id
   async findAll() {
     const equipos = await this.equipoModel.find().exec();
     return equipos.map(equipo => ({
@@ -24,7 +22,6 @@ export class EquiposService {
     }));
   }
 
-  // Opcionalmente también puedes corregir findOne para mantener consistencia
   async findOne(id: string) {
     const equipo = await this.equipoModel.findById(id).exec();
     if (!equipo) {
