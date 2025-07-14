@@ -11,25 +11,42 @@ export class EquiposService {
     @InjectModel('Equipo') private readonly equipoModel: Model<any> // Inyecta el modelo de equipo
   ) {}
 
+  // Método corregido para mapear _id a id
   async findAll() {
-    return this.equipoModel.find().exec(); // Devuelve todos los equipos
+    const equipos = await this.equipoModel.find().exec();
+    return equipos.map(equipo => ({
+      id: equipo._id.toString(),
+      nombre: equipo.nombre,
+      ciudad: equipo.ciudad,
+      entrenador: equipo.entrenador,
+      escudoUrl: equipo.escudoUrl,
+      puntos: equipo.puntos,
+    }));
   }
 
+  // Opcionalmente también puedes corregir findOne para mantener consistencia
   async findOne(id: string) {
-    const equipo = await this.equipoModel.findById(id).exec(); // Busca equipo por ID
+    const equipo = await this.equipoModel.findById(id).exec();
     if (!equipo) {
-      throw new NotFoundException(`Equipo con id ${id} no encontrado`); // Si no existe, lanza error
+      throw new NotFoundException(`Equipo con id ${id} no encontrado`);
     }
-    return equipo;
+    return {
+      id: equipo._id.toString(),
+      nombre: equipo.nombre,
+      ciudad: equipo.ciudad,
+      entrenador: equipo.entrenador,
+      escudoUrl: equipo.escudoUrl,
+      puntos: equipo.puntos,
+    };
   }
 
   async create(createEquipoDto: CreateEquipoDto) {
-    const nuevo = new this.equipoModel(createEquipoDto); // Crea nuevo documento
-    return nuevo.save(); // Guarda en Mongo
+    const nuevo = new this.equipoModel(createEquipoDto);
+    return nuevo.save();
   }
 
   async update(id: string, updateEquipoDto: CreateEquipoDto) {
-    const actualizado = await this.equipoModel.findByIdAndUpdate(id, updateEquipoDto, { new: true }); // Actualiza y retorna el nuevo
+    const actualizado = await this.equipoModel.findByIdAndUpdate(id, updateEquipoDto, { new: true });
     if (!actualizado) {
       throw new NotFoundException(`Equipo con id ${id} no encontrado`);
     }
@@ -37,7 +54,7 @@ export class EquiposService {
   }
 
   async remove(id: string) {
-    const eliminado = await this.equipoModel.findByIdAndDelete(id); // Elimina el documento
+    const eliminado = await this.equipoModel.findByIdAndDelete(id);
     if (!eliminado) {
       throw new NotFoundException(`Equipo con id ${id} no encontrado`);
     }

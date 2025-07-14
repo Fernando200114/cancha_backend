@@ -2,6 +2,7 @@
 
 import { Schema } from 'mongoose'; // Importa Schema de mongoose
 
+
 export const EquipoSchema = new Schema({
   nombre: { type: String, required: true }, // Nombre del equipo
   ciudad: { type: String, required: true }, // Ciudad del equipo
