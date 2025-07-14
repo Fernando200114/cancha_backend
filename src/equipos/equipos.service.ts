@@ -12,14 +12,14 @@ export class EquiposService {
 
   async findAll() {
     const equipos = await this.equipoModel.find().exec();
-    return equipos.map(equipo => ({
-      id: equipo._id.toString(),
-      nombre: equipo.nombre,
-      ciudad: equipo.ciudad,
-      entrenador: equipo.entrenador,
-      escudoUrl: equipo.escudoUrl,
-      puntos: equipo.puntos,
-    }));
+   return equipos.map(equipo => ({
+  _id: equipo._id, // ← DEJA ESTE NOMBRE
+  nombre: equipo.nombre,
+  ciudad: equipo.ciudad,
+  entrenador: equipo.entrenador,
+  escudoUrl: equipo.escudoUrl,
+  puntos: equipo.puntos,
+}));
   }
 
   async findOne(id: string) {
@@ -28,13 +28,14 @@ export class EquiposService {
       throw new NotFoundException(`Equipo con id ${id} no encontrado`);
     }
     return {
-      id: equipo._id.toString(),
-      nombre: equipo.nombre,
-      ciudad: equipo.ciudad,
-      entrenador: equipo.entrenador,
-      escudoUrl: equipo.escudoUrl,
-      puntos: equipo.puntos,
-    };
+  _id: equipo._id,
+  nombre: equipo.nombre,
+  ciudad: equipo.ciudad,
+  entrenador: equipo.entrenador,
+  escudoUrl: equipo.escudoUrl,
+  puntos: equipo.puntos,
+};
+
   }
 
   async create(createEquipoDto: CreateEquipoDto) {

@@ -1,19 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+// import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity('jugadores')
-export class Jugador {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+// @Entity('jugadores')
+// export class Jugador {
+//   @PrimaryGeneratedColumn('uuid')
+//   id: string;
 
-  @Column()
-  nombre: string;
+//   @Column()
+//   nombre: string;
 
-  @Column()
-  edad: number;
+//   @Column()
+//   edad: number;
 
-  @Column()
-  posicion: string;
+//   @Column()
+//   posicion: string;
 
-  @Column()
-  numero: number;
-}
+//   @Column()
+//   numero: number;
+// }
