@@ -64,8 +64,9 @@ export class EquiposController {
     if (!file) {
       throw new Error('Archivo no recibido');
     }
-    return {
-      url: `/imagenes/${file.filename}`, // URL para acceder a la imagen
-    };
+   return {
+  url: `https://nestjs-cancha-backend-api.desarrollo-software.xyz/imagenes/${file.filename}`,
+};
+
   }
 }
