@@ -1,10 +1,31 @@
+// 
+
+
 // src/equipos/equipos.controller.ts
-import { Controller, Get, Post, Body, Param, Put, Delete, UploadedFile, UseInterceptors } from '@nestjs/common';
+
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  Delete,
+  UploadedFile,
+  UseInterceptors,
+  Req,
+} from '@nestjs/common';
 import { EquiposService } from './equipos.service';
-import { CreateEquipoDto } from './dto/create-equipo.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { Request } from 'express';
+
+const generarNombreImagen = (originalName: string) => {
+  const ext = extname(originalName);
+  const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+  return `escudo-${uniqueSuffix}${ext}`;
+};
 
 @Controller('equipos')
 export class EquiposController {
@@ -21,13 +42,60 @@ export class EquiposController {
   }
 
   @Post()
-  create(@Body() createEquipoDto: CreateEquipoDto) {
-    return this.equiposService.create(createEquipoDto);
+  @UseInterceptors(
+    FileInterceptor('escudo', {
+      storage: diskStorage({
+        destination: './imagenes',
+        filename: (_, file, cb) => cb(null, generarNombreImagen(file.originalname)),
+      }),
+      limits: { fileSize: 5 * 1024 * 1024 },
+    }),
+  )
+  async create(@UploadedFile() file: Express.Multer.File, @Req() req: Request) {
+    const body = req.body;
+
+    const nuevoEquipo = {
+      nombre: body.nombre,
+      ciudad: body.ciudad,
+      entrenador: body.entrenador,
+      puntos: parseInt(body.puntos) || 0,
+      escudoUrl: file
+        ? `https://nestjs-cancha-backend-api.desarrollo-software.xyz/imagenes/${file.filename}`
+        : '',
+    };
+
+    return this.equiposService.create(nuevoEquipo);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateEquipoDto: CreateEquipoDto) {
-    return this.equiposService.update(id, updateEquipoDto);
+  @UseInterceptors(
+    FileInterceptor('escudo', {
+      storage: diskStorage({
+        destination: './imagenes',
+        filename: (_, file, cb) => cb(null, generarNombreImagen(file.originalname)),
+      }),
+      limits: { fileSize: 5 * 1024 * 1024 },
+    }),
+  )
+  async update(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: Request,
+  ) {
+    const body = req.body;
+
+    const equipoActualizado = {
+      nombre: body.nombre,
+      ciudad: body.ciudad,
+      entrenador: body.entrenador,
+      puntos: parseInt(body.puntos) || 0,
+    };
+
+    if (file) {
+      equipoActualizado['escudoUrl'] = `https://nestjs-cancha-backend-api.desarrollo-software.xyz/imagenes/${file.filename}`;
+    }
+
+    return this.equiposService.update(id, equipoActualizado);
   }
 
   @Delete(':id')
@@ -35,38 +103,22 @@ export class EquiposController {
     return this.equiposService.remove(id);
   }
 
-  // NUEVO endpoint para subir imágenes
-  @Post('upload')
+  @Post('upload') // opcional si solo haces esto desde /equipos POST
   @UseInterceptors(
     FileInterceptor('escudo', {
       storage: diskStorage({
-        destination: './imagenes', // Carpeta local donde guardar imágenes
-        filename: (req, file, cb) => {
-          // Crear nombre único para evitar sobreescrituras
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          cb(null, `escudo-${uniqueSuffix}${ext}`);
-        },
+        destination: './imagenes',
+        filename: (_, file, cb) => cb(null, generarNombreImagen(file.originalname)),
       }),
-      fileFilter: (req, file, cb) => {
-        // Aceptar solo imágenes
-        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
-          cb(new Error('Solo se permiten imágenes'), false);
-        } else {
-          cb(null, true);
-        }
-      },
-      limits: { fileSize: 5 * 1024 * 1024 }, // Limite 5MB
     }),
   )
   uploadFile(@UploadedFile() file: Express.Multer.File) {
-    // Retorna la URL para que el frontend la guarde en escudoUrl
     if (!file) {
       throw new Error('Archivo no recibido');
     }
-   return {
-  url: `https://nestjs-cancha-backend-api.desarrollo-software.xyz/imagenes/${file.filename}`,
-};
 
+    return {
+      url: `https://nestjs-cancha-backend-api.desarrollo-software.xyz/imagenes/${file.filename}`,
+    };
   }
 }
