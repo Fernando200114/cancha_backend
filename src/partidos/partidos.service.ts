@@ -1,4 +1,3 @@
-
 // src/partidos/partidos.service.ts
 
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -9,22 +8,34 @@ import { CreatePartidoDto } from './dto/create-partido.dto';
 @Injectable()
 export class PartidosService {
   constructor(
-    @InjectModel('Partido') private readonly partidoModel: Model<any>
+    @InjectModel('Partido') private readonly partidoModel: Model<any>,
+    @InjectModel('Equipo') private readonly equipoModel: Model<any>, // ✅ necesario para obtener los nombres
   ) {}
 
+  // ✅ Obtener todos los partidos con nombres de equipos
   async findAll() {
-    return this.partidoModel.find().exec(); // Lista todos los partidos
+    const partidos = await this.partidoModel.find().lean();
+    const equipos = await this.equipoModel.find().lean();
+const equiposMap = new Map(
+  equipos.map((e: any) => [e._id.toString(), e.nombre])
+);
+
+    return partidos.map((partido) => ({
+      ...partido,
+      equipoLocalNombre: equiposMap.get(partido.equipoLocalId) || 'Desconocido',
+      equipoVisitanteNombre: equiposMap.get(partido.equipoVisitanteId) || 'Desconocido',
+    }));
   }
 
   async findOne(id: string) {
-    const partido = await this.partidoModel.findById(id).exec(); // Busca partido por ID
+    const partido = await this.partidoModel.findById(id).exec();
     if (!partido) throw new NotFoundException(`Partido con id ${id} no encontrado`);
     return partido;
   }
 
   async create(createPartidoDto: CreatePartidoDto) {
-    const partido = new this.partidoModel(createPartidoDto); // Crea un nuevo partido
-    return partido.save(); // Guarda en MongoDB
+    const partido = new this.partidoModel(createPartidoDto);
+    return partido.save();
   }
 
   async update(id: string, updatePartidoDto: CreatePartidoDto) {
