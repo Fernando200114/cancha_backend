@@ -1,27 +1,28 @@
-// src/partidos/dto/create-partido.dto.ts
-
 import { IsString, IsNotEmpty, IsOptional, IsNumber, IsMongoId } from 'class-validator';
+import { Type } from 'class-transformer'; // ✅ Import necesario para transformar los números
 
 export class CreatePartidoDto {
   @IsMongoId({ message: 'equipoLocalId debe ser un ID Mongo válido' })
-  readonly equipoLocalId: string;       // ID del equipo local
+  readonly equipoLocalId: string; // ID del equipo local
 
   @IsMongoId({ message: 'equipoVisitanteId debe ser un ID Mongo válido' })
-  readonly equipoVisitanteId: string;   // ID del equipo visitante
+  readonly equipoVisitanteId: string; // ID del equipo visitante
 
   @IsString()
   @IsNotEmpty({ message: 'La fecha es obligatoria' })
-  readonly fecha: string;               // Fecha del partido (ISO string)
+  readonly fecha: string; // Fecha del partido (ISO string)
 
   @IsString()
   @IsNotEmpty({ message: 'El lugar es obligatorio' })
-  readonly lugar: string;               // Lugar del encuentro
+  readonly lugar: string; // Lugar del encuentro
 
   @IsOptional()
-  @IsNumber()
-  readonly golesLocal?: number;         // Goles del equipo local (opcional)
+  @Type(() => Number) // ✅ Transforma string a number
+  @IsNumber({}, { message: 'golesLocal debe ser un número' })
+  readonly golesLocal?: number; // Goles del equipo local
 
   @IsOptional()
-  @IsNumber()
-  readonly golesVisitante?: number;     // Goles del equipo visitante (opcional)
+  @Type(() => Number) // ✅ Transforma string a number
+  @IsNumber({}, { message: 'golesVisitante debe ser un número' })
+  readonly golesVisitante?: number; // Goles del equipo visitante
 }
