@@ -1,5 +1,5 @@
 // src/jugadores/jugadores.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateJugadorDto } from './dto/create-jugador.dto';
@@ -7,7 +7,8 @@ import { CreateJugadorDto } from './dto/create-jugador.dto';
 @Injectable()
 export class JugadoresService {
   constructor(
-    @InjectModel('Jugador') private readonly jugadorModel: Model<any>
+    @InjectModel('Jugador') private readonly jugadorModel: Model<any>,
+    @InjectModel('Equipo') private readonly equipoModel: Model<any>, // ← AÑADIDO
   ) {}
 
   async findAll() {
@@ -46,11 +47,21 @@ export class JugadoresService {
   }
 
   async create(createJugadorDto: CreateJugadorDto) {
+    const equipoExiste = await this.equipoModel.findById(createJugadorDto.equipoId);
+    if (!equipoExiste) {
+      throw new BadRequestException('El equipo no existe');
+    }
+
     const nuevo = new this.jugadorModel(createJugadorDto);
     return nuevo.save();
   }
 
   async update(id: string, updateJugadorDto: CreateJugadorDto) {
+    const equipoExiste = await this.equipoModel.findById(updateJugadorDto.equipoId);
+    if (!equipoExiste) {
+      throw new BadRequestException('El equipo no existe');
+    }
+
     const actualizado = await this.jugadorModel.findByIdAndUpdate(id, updateJugadorDto, { new: true });
     if (!actualizado) throw new NotFoundException(`Jugador con id ${id} no encontrado`);
     return actualizado;
