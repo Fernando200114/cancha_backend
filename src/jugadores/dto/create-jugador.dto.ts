@@ -1,10 +1,31 @@
 // src/jugadores/dto/create-jugador.dto.ts
 
+import { IsString, IsNotEmpty, IsOptional, IsMongoId, IsInt, Min } from 'class-validator';
+
 export class CreateJugadorDto {
-  readonly nombre: string; // Nombre del jugador
-  readonly posicion: string; // Posición (defensa, delantero, etc.)
-  readonly equipoId: string; // ID del equipo al que pertenece
-  readonly goles?: number; // Cantidad de goles anotados (opcional)
-  readonly tarjetasAmarillas?: number; // Cantidad de tarjetas amarillas (opcional)
-  readonly tarjetasRojas?: number; // Cantidad de tarjetas rojas (opcional)
+  @IsString()
+  @IsNotEmpty({ message: 'El nombre es obligatorio' })
+  readonly nombre: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'La posición es obligatoria' })
+  readonly posicion: string;
+
+  @IsMongoId({ message: 'El equipoId debe ser un ID válido de MongoDB' })
+  readonly equipoId: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  readonly goles?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  readonly tarjetasAmarillas?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  readonly tarjetasRojas?: number;
 }
