@@ -18,4 +18,8 @@ export class UsuariosService {
   async buscarPorCorreo(correo: string): Promise<Usuario | null> {
     return this.usuarioRepo.findOne({ where: { correo } });
   }
+
+  async findAll(): Promise<Usuario[]> {
+    return this.usuarioRepo.find();
+  }
 }
