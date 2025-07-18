@@ -1,4 +1,4 @@
-// // src/equipos/dto/create-equipo.dto.ts
+// // src/equipos/dto/update-equipo.dto.ts
 
 export class UpdateEquipoDto {
     readonly nombre?: string; // Nombre del equipo 
