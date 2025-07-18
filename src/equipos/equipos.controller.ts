@@ -14,12 +14,14 @@ import {
   UploadedFile,
   UseInterceptors,
   Req,
+  NotFoundException,
 } from '@nestjs/common';
 import { EquiposService } from './equipos.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { Request } from 'express';
+import { UpdateEquipoDto } from './dto/update-equipo.dto';
 
 const generarNombreImagen = (originalName: string) => {
   const ext = extname(originalName);
@@ -29,7 +31,7 @@ const generarNombreImagen = (originalName: string) => {
 
 @Controller('equipos')
 export class EquiposController {
-  constructor(private readonly equiposService: EquiposService) {}
+  constructor(private readonly equiposService: EquiposService) { }
 
   @Get()
   findAll() {
@@ -68,34 +70,9 @@ export class EquiposController {
   }
 
   @Put(':id')
-  @UseInterceptors(
-    FileInterceptor('escudo', {
-      storage: diskStorage({
-        destination: './imagenes',
-        filename: (_, file, cb) => cb(null, generarNombreImagen(file.originalname)),
-      }),
-      limits: { fileSize: 5 * 1024 * 1024 },
-    }),
-  )
-  async update(
-    @Param('id') id: string,
-    @UploadedFile() file: Express.Multer.File,
-    @Req() req: Request,
-  ) {
-    const body = req.body;
-
-    const equipoActualizado = {
-      nombre: body.nombre,
-      ciudad: body.ciudad,
-      entrenador: body.entrenador,
-      puntos: parseInt(body.puntos) || 0,
-    };
-
-    if (file) {
-      equipoActualizado['escudoUrl'] = `https://nestjs-cancha-backend-api.desarrollo-software.xyz/imagenes/${file.filename}`;
-    }
-
-    return this.equiposService.update(id, equipoActualizado);
+  async update(@Param('id') id: string, @Body() dto: UpdateEquipoDto) {
+    const equipo = await this.equiposService.update(id, dto);
+    if (!equipo) throw new NotFoundException('Equipo no encontrado');
   }
 
   @Delete(':id')
