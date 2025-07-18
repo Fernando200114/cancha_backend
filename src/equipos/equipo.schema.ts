@@ -22,7 +22,7 @@ export const EquipoSchema = new Schema(
     nombre: { type: String, required: true },
     ciudad: { type: String, required: true },
     entrenador: { type: String, required: true },
-    escudoUrl: { type: String, default: '' },
+    escudoUrl: { type: String, nullable: true },
     puntos: { type: Number, default: 0 },
   },
   {
