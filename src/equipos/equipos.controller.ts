@@ -61,9 +61,7 @@ export class EquiposController {
       ciudad: body.ciudad,
       entrenador: body.entrenador,
       puntos: parseInt(body.puntos) || 0,
-      escudoUrl: file
-        ? `https://nestjs-cancha-backend-api.desarrollo-software.xyz/imagenes/${file.filename}`
-        : '',
+      escudoUrl: body.escudoUrl
     };
 
     return this.equiposService.create(nuevoEquipo);
