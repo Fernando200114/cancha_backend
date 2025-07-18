@@ -71,6 +71,7 @@ export class EquiposController {
   async update(@Param('id') id: string, @Body() dto: UpdateEquipoDto) {
     const equipo = await this.equiposService.update(id, dto);
     if (!equipo) throw new NotFoundException('Equipo no encontrado');
+    return equipo;
   }
 
   @Delete(':id')

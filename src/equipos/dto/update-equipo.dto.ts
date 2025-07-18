@@ -1,10 +1,25 @@
-// // src/equipos/dto/update-equipo.dto.ts
+// src/equipos/dto/update-equipo.dto.ts
+
+import { IsOptional, IsString, IsNumber } from 'class-validator';
 
 export class UpdateEquipoDto {
-    readonly nombre?: string; // Nombre del equipo 
-    readonly ciudad?: string; // Ciudad de origen del equipo
-    readonly entrenador?: string; // Nombre del entrenador
-    readonly escudoUrl?: string; // URL opcional del escudo del equipo
-    readonly puntos?: number; // Puntos en la tabla 
-  }
-  
+  @IsOptional()
+  @IsString()
+  readonly nombre?: string;
+
+  @IsOptional()
+  @IsString()
+  readonly ciudad?: string;
+
+  @IsOptional()
+  @IsString()
+  readonly entrenador?: string;
+
+  @IsOptional()
+  @IsString()
+  readonly escudoUrl?: string;
+
+  @IsOptional()
+  @IsNumber()
+  readonly puntos?: number;
+}
