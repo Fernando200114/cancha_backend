@@ -70,12 +70,11 @@ export class EquiposController {
       ciudad: body.ciudad,
       entrenador: body.entrenador,
       puntos: parseInt(body.puntos) || 0,
-      escudoUrl: file ? file.filename : '',  // aquí la ruta de la imagen subida
+      escudoUrl: body.escudoUrl
     };
 
     return this.equiposService.create(nuevoEquipo);
   }
-
 
   @Put(':id')
   @Roles('admin')
@@ -113,3 +112,4 @@ export class EquiposController {
     };
   }
 }
+
