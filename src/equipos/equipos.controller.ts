@@ -15,6 +15,7 @@ import {
   UseInterceptors,
   Req,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { EquiposService } from './equipos.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -22,6 +23,9 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { Request } from 'express';
 import { UpdateEquipoDto } from './dto/update-equipo.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { Roles } from 'src/auth/guards/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 const generarNombreImagen = (originalName: string) => {
   const ext = extname(originalName);
@@ -29,21 +33,26 @@ const generarNombreImagen = (originalName: string) => {
   return `escudo-${uniqueSuffix}${ext}`;
 };
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('equipos')
 export class EquiposController {
   constructor(private readonly equiposService: EquiposService) { }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   findAll() {
     return this.equiposService.findAll();
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   findOne(@Param('id') id: string) {
     return this.equiposService.findOne(id);
   }
 
   @Post()
+  @Roles('admin')
+
   @UseInterceptors(
     FileInterceptor('escudo', {
       storage: diskStorage({
@@ -61,13 +70,16 @@ export class EquiposController {
       ciudad: body.ciudad,
       entrenador: body.entrenador,
       puntos: parseInt(body.puntos) || 0,
-      escudoUrl: body.escudoUrl
+      escudoUrl: file ? `/imagenes/${file.filename}` : '',  // aquí la ruta de la imagen subida
     };
 
     return this.equiposService.create(nuevoEquipo);
   }
 
+
   @Put(':id')
+  @Roles('admin')
+
   async update(@Param('id') id: string, @Body() dto: UpdateEquipoDto) {
     const equipo = await this.equiposService.update(id, dto);
     if (!equipo) throw new NotFoundException('Equipo no encontrado');
@@ -75,11 +87,14 @@ export class EquiposController {
   }
 
   @Delete(':id')
+  @Roles('admin')
+
   remove(@Param('id') id: string) {
     return this.equiposService.remove(id);
   }
 
   @Post('upload') // opcional si solo haces esto desde /equipos POST
+  @Roles('admin')
   @UseInterceptors(
     FileInterceptor('escudo', {
       storage: diskStorage({

@@ -21,7 +21,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';      // Asegúrate que 
 import { Roles } from '../auth/guards/roles.decorator';       // Asegúrate que la ruta es correcta
 
 @Controller('usuarios')
-@UseGuards(JwtAuthGuard, RolesGuard) // Aplica ambos guards al controlador completo
+// @UseGuards(JwtAuthGuard, RolesGuard) // Aplica ambos guards al controlador completo
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
@@ -36,4 +36,9 @@ export class UsuariosController {
   async crear(@Body() usuarioData: Partial<Usuario>): Promise<Usuario> {
     return this.usuariosService.crear(usuarioData);
   }
+
+  //  @Post('crear-admin-temporal')
+  // async crearAdminTemporal() {
+  //   return this.usuariosService.crearAdmin();
+  // }
 }
