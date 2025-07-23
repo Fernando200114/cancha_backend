@@ -1,8 +1,3 @@
-// // 
-
-
-// // src/equipos/equipos.controller.ts
-
 // import {
 //   Controller,
 //   Get,
@@ -33,52 +28,49 @@
 //   return `escudo-${uniqueSuffix}${ext}`;
 // };
 
-// @UseGuards(JwtAuthGuard, RolesGuard)
 // @Controller('equipos')
 // export class EquiposController {
-//   constructor(private readonly equiposService: EquiposService) { }
+//   constructor(private readonly equiposService: EquiposService) {}
 
+//   // Rutas públicas
 //   @Get()
-//   @UseGuards(JwtAuthGuard)
 //   findAll() {
 //     return this.equiposService.findAll();
 //   }
 
 //   @Get(':id')
-//   @UseGuards(JwtAuthGuard)
 //   findOne(@Param('id') id: string) {
 //     return this.equiposService.findOne(id);
 //   }
 
+//   // Rutas protegidas solo para admin con token
 //   @Post()
+//   @UseGuards(JwtAuthGuard, RolesGuard)
 //   @Roles('admin')
-
 //   @UseInterceptors(
 //     FileInterceptor('escudo', {
 //       storage: diskStorage({
 //         destination: './imagenes',
 //         filename: (_, file, cb) => cb(null, generarNombreImagen(file.originalname)),
 //       }),
-//       limits: { fileSize: 5 * 1024 * 1024 },
+//       limits: { fileSize: 5 * 1024 * 1024 }, // límite 5MB
 //     }),
 //   )
 //   async create(@UploadedFile() file: Express.Multer.File, @Req() req: Request) {
 //     const body = req.body;
-
 //     const nuevoEquipo = {
 //       nombre: body.nombre,
 //       ciudad: body.ciudad,
 //       entrenador: body.entrenador,
 //       puntos: parseInt(body.puntos) || 0,
-//       escudoUrl: body.escudoUrl
+//       escudoUrl: body.escudoUrl,
 //     };
-
 //     return this.equiposService.create(nuevoEquipo);
 //   }
 
 //   @Put(':id')
+//   @UseGuards(JwtAuthGuard, RolesGuard)
 //   @Roles('admin')
-
 //   async update(@Param('id') id: string, @Body() dto: UpdateEquipoDto) {
 //     const equipo = await this.equiposService.update(id, dto);
 //     if (!equipo) throw new NotFoundException('Equipo no encontrado');
@@ -86,13 +78,14 @@
 //   }
 
 //   @Delete(':id')
+//   @UseGuards(JwtAuthGuard, RolesGuard)
 //   @Roles('admin')
-
 //   remove(@Param('id') id: string) {
 //     return this.equiposService.remove(id);
 //   }
 
-//   @Post('upload') // opcional si solo haces esto desde /equipos POST
+//   @Post('upload')
+//   @UseGuards(JwtAuthGuard, RolesGuard)
 //   @Roles('admin')
 //   @UseInterceptors(
 //     FileInterceptor('escudo', {
@@ -106,7 +99,6 @@
 //     if (!file) {
 //       throw new Error('Archivo no recibido');
 //     }
-
 //     return {
 //       url: `https://nestjs-cancha-backend-api.desarrollo-software.xyz/imagenes/${file.filename}`,
 //     };
@@ -139,6 +131,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Roles } from 'src/auth/guards/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 
+// Función para generar nombre único para la imagen
 const generarNombreImagen = (originalName: string) => {
   const ext = extname(originalName);
   const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -167,8 +160,11 @@ export class EquiposController {
   @UseInterceptors(
     FileInterceptor('escudo', {
       storage: diskStorage({
-        destination: './imagenes',
-        filename: (_, file, cb) => cb(null, generarNombreImagen(file.originalname)),
+        destination: './imagenes', // carpeta para guardar imágenes
+        filename: (_, file, cb) => {
+          const filename = generarNombreImagen(file.originalname);
+          cb(null, filename);
+        },
       }),
       limits: { fileSize: 5 * 1024 * 1024 }, // límite 5MB
     }),
@@ -180,7 +176,9 @@ export class EquiposController {
       ciudad: body.ciudad,
       entrenador: body.entrenador,
       puntos: parseInt(body.puntos) || 0,
-      escudoUrl: body.escudoUrl,
+      escudoUrl: file
+        ? `https://nestjs-cancha-backend-api.desarrollo-software.xyz/imagenes/${file.filename}`
+        : '',
     };
     return this.equiposService.create(nuevoEquipo);
   }
@@ -201,6 +199,7 @@ export class EquiposController {
     return this.equiposService.remove(id);
   }
 
+  // Ruta para subir solo la imagen de escudo (opcional)
   @Post('upload')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
@@ -208,7 +207,10 @@ export class EquiposController {
     FileInterceptor('escudo', {
       storage: diskStorage({
         destination: './imagenes',
-        filename: (_, file, cb) => cb(null, generarNombreImagen(file.originalname)),
+        filename: (_, file, cb) => {
+          const filename = generarNombreImagen(file.originalname);
+          cb(null, filename);
+        },
       }),
     }),
   )
