@@ -140,7 +140,7 @@ const generarNombreImagen = (originalName: string) => {
 
 @Controller('equipos')
 export class EquiposController {
-  constructor(private readonly equiposService: EquiposService) {}
+  constructor(private readonly equiposService: EquiposService) { }
 
   // Rutas públicas
   @Get()
@@ -160,10 +160,11 @@ export class EquiposController {
   @UseInterceptors(
     FileInterceptor('escudo', {
       storage: diskStorage({
-        destination: './imagenes', // carpeta para guardar imágenes
-        filename: (_, file, cb) => {
-          const filename = generarNombreImagen(file.originalname);
-          cb(null, filename);
+        destination: './public/imagenes',
+        filename: (req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
         },
       }),
       limits: { fileSize: 5 * 1024 * 1024 }, // límite 5MB
@@ -177,7 +178,7 @@ export class EquiposController {
       entrenador: body.entrenador,
       puntos: parseInt(body.puntos) || 0,
       escudoUrl: file
-        ? `https://nestjs-cancha-backend-api.desarrollo-software.xyz/imagenes/${file.filename}`
+        ? `${file.filename}`
         : '',
     };
     return this.equiposService.create(nuevoEquipo);
