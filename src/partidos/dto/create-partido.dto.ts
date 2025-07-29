@@ -1,36 +1,80 @@
+// import { IsString, IsNotEmpty, IsOptional, IsNumber, IsMongoId, IsIn } from 'class-validator';
+// import { Type } from 'class-transformer'; // ✅ Import necesario para transformar los números
+
+// export class CreatePartidoDto {
+//   @IsMongoId({ message: 'equipoLocalId debe ser un ID Mongo válido' })
+//   readonly equipoLocalId: string; // ID del equipo local
+
+//   @IsMongoId({ message: 'equipoVisitanteId debe ser un ID Mongo válido' })
+//   readonly equipoVisitanteId: string; // ID del equipo visitante
+
+//   @IsString()
+//   @IsNotEmpty({ message: 'La fecha es obligatoria' })
+//   readonly fecha: string; // Fecha del partido (ISO string)
+
+//   @IsString()
+//   @IsNotEmpty({ message: 'El lugar es obligatorio' })
+//   readonly lugar: string; // Lugar del encuentro
+
+//   @IsOptional()
+//   @Type(() => Number) // ✅ Transforma string a number
+//   @IsNumber({}, { message: 'golesLocal debe ser un número' })
+//   readonly golesLocal?: number; // Goles del equipo local
+
+//   @IsOptional()
+//   @Type(() => Number) // ✅ Transforma string a number
+//   @IsNumber({}, { message: 'golesVisitante debe ser un número' })
+//   readonly golesVisitante?: number; // Goles del equipo visitante
+
+// // Aquí agregas el nuevo campo
+//   @IsString()
+//   @IsNotEmpty()
+//   @IsIn(['programado', 'jugado', 'cancelado'], {
+//     message: 'estado debe ser "programado", "jugado" o "cancelado"',
+//   })
+//   readonly estado: string;
+// }
+
 import { IsString, IsNotEmpty, IsOptional, IsNumber, IsMongoId, IsIn } from 'class-validator';
-import { Type } from 'class-transformer'; // ✅ Import necesario para transformar los números
+import { Type } from 'class-transformer';
 
 export class CreatePartidoDto {
   @IsMongoId({ message: 'equipoLocalId debe ser un ID Mongo válido' })
-  readonly equipoLocalId: string; // ID del equipo local
+  readonly equipoLocalId: string;
 
   @IsMongoId({ message: 'equipoVisitanteId debe ser un ID Mongo válido' })
-  readonly equipoVisitanteId: string; // ID del equipo visitante
+  readonly equipoVisitanteId: string;
 
   @IsString()
   @IsNotEmpty({ message: 'La fecha es obligatoria' })
-  readonly fecha: string; // Fecha del partido (ISO string)
+  readonly fecha: string;
 
   @IsString()
   @IsNotEmpty({ message: 'El lugar es obligatorio' })
-  readonly lugar: string; // Lugar del encuentro
+  readonly lugar: string;
 
   @IsOptional()
-  @Type(() => Number) // ✅ Transforma string a number
+  @Type(() => Number)
   @IsNumber({}, { message: 'golesLocal debe ser un número' })
-  readonly golesLocal?: number; // Goles del equipo local
+  readonly golesLocal?: number;
 
   @IsOptional()
-  @Type(() => Number) // ✅ Transforma string a number
+  @Type(() => Number)
   @IsNumber({}, { message: 'golesVisitante debe ser un número' })
-  readonly golesVisitante?: number; // Goles del equipo visitante
+  readonly golesVisitante?: number;
 
-// Aquí agregas el nuevo campo
   @IsString()
   @IsNotEmpty()
   @IsIn(['programado', 'jugado', 'cancelado'], {
     message: 'estado debe ser "programado", "jugado" o "cancelado"',
   })
   readonly estado: string;
+
+  @IsOptional()
+  @IsString()
+  readonly liga?: string;
+
+  @IsOptional()
+  @IsString()
+  readonly arbitro?: string;
 }
