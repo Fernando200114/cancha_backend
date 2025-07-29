@@ -77,4 +77,10 @@ export class CreatePartidoDto {
   @IsOptional()
   @IsString()
   readonly arbitro?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  readonly hora?: string; // <-- nuevo campo hora
 }
+
