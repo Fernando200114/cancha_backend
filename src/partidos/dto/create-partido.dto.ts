@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber, IsMongoId } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber, IsMongoId, IsIn } from 'class-validator';
 import { Type } from 'class-transformer'; // ✅ Import necesario para transformar los números
 
 export class CreatePartidoDto {
@@ -25,4 +25,12 @@ export class CreatePartidoDto {
   @Type(() => Number) // ✅ Transforma string a number
   @IsNumber({}, { message: 'golesVisitante debe ser un número' })
   readonly golesVisitante?: number; // Goles del equipo visitante
+
+// Aquí agregas el nuevo campo
+  @IsString()
+  @IsNotEmpty()
+  @IsIn(['programado', 'jugado', 'cancelado'], {
+    message: 'estado debe ser "programado", "jugado" o "cancelado"',
+  })
+  readonly estado: string;
 }

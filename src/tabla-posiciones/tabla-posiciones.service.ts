@@ -58,7 +58,7 @@ export class TablaPosicionesService {
 
     // Convertir mapa a array y calcular diferencia de goles (DG)
     const resultado = Array.from(tabla.entries()).map(([equipoId, datos]) => ({
-      equipoId,
+      equipoId, 
       ...datos,
       DG: datos.GF - datos.GC,
     }));

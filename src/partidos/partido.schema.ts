@@ -9,4 +9,5 @@ export const PartidoSchema = new Schema({
   lugar: { type: String, required: true },                 // Lugar del partido
   golesLocal: { type: Number, default: 0 },                // Goles del local
   golesVisitante: { type: Number, default: 0 },            // Goles del visitante
+  jugado: { type: Boolean, default: false }, 
 });
