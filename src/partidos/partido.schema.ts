@@ -20,7 +20,7 @@ import { Schema } from 'mongoose';
 export const PartidoSchema = new Schema({
   equipoLocalId: { type: String, required: true },
   equipoVisitanteId: { type: String, required: true },
-  fecha: { type: String, required: true },
+  fecha: { type: Date, required: true },
   hora: { type: String, required: false }, // <-- nuevo
   lugar: { type: String, required: true },
   golesLocal: { type: Number, default: 0 },
